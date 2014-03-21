@@ -1,8 +1,22 @@
 var express = require('express')
   , passport = require('passport')
   , util = require('util')
-  , FacebookStrategy = require('passport-facebook').Strategy;
-  , config = require('./config/config');
+  , FacebookStrategy = require('passport-facebook').Strategy
+;
+
+var port = process.env.PORT || 3000;
+
+var config = {};
+
+if (!process.env.FACEBOOK_APP_ID) {
+  // from file
+  config = require('./config/config');
+}
+else {
+  // from ENV (heroku)
+  config.FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+  config.FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+}
 
 var FACEBOOK_APP_ID = config.FACEBOOK_APP_ID;
 var FACEBOOK_APP_SECRET = config.FACEBOOK_APP_SECRET;
@@ -31,7 +45,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http://127.0.0.1:3000/auth/facebook/callback"
+    callbackURL: "http://127.0.0.1:" + port + "/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
@@ -111,8 +125,8 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.listen(3000);
-
+app.listen(port);
+console.log('running at: http://localhost:' + port);
 
 // Simple route middleware to ensure user is authenticated.
 //   Use this route middleware on any resource that needs to be protected.  If
