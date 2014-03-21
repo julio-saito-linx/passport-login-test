@@ -38,7 +38,14 @@ passport.deserializeUser(function(obj, done) {
 });
 
 
-var ip = process.env.IP || 'http://localhost';
+var callbackURL = "";
+if(process.env.IP){
+  callbackURL = process.env.IP + "/auth/facebook/callback";
+}
+else{
+  callbackURL = "http://localhost:" + port + "/auth/facebook/callback"
+}
+
 
 // Use the FacebookStrategy within Passport.
 //   Strategies in Passport require a `verify` function, which accept
@@ -47,7 +54,7 @@ var ip = process.env.IP || 'http://localhost';
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http:" + ip + ":" + port + "/auth/facebook/callback"
+    callbackURL: callbackURL
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
