@@ -1,0 +1,73 @@
+<% if (!user) { %>
+
+<link rel="stylesheet" type="text/css" href="bootstrap/dist/css/bootstrap.min.css">
+<div class="container">
+	
+    <h1>Welcome! Please log in.</h1>
+    <hr>
+    <a href="/auth/facebook">
+        <img src="login-with-facebook.png" width="154" height="22">
+    </a>
+</div>
+
+<% } else { %>
+
+<link rel="stylesheet" type="text/css" href="google-code-prettify/src/prettify.css">
+<link rel="stylesheet" type="text/css" href="bootstrap/dist/css/bootstrap.min.css">
+
+<style type="text/css">
+    body{
+        font-size: 18px;
+    }
+</style>
+
+<div class="container">
+
+    <h1>Hi, you are logged in!</h1>
+    <hr>
+    <p>
+        Now that you are logged in, I know a lot about you <b><%= user.name.givenName %></b>.
+    </p>
+    <p>
+        You are <b><%= user._json.gender %></b> and your email is <b><%= user._json.email %></b>
+    </p>
+    <p>
+        You are from <b><%= user._json.hometown.name %></b> and your current location are <b><%= user._json.location.name %></b>.
+    </p>
+    <hr>
+    <p>
+        You worked in these companies:
+        <ul>
+            <% for(var i=0; i< user._json.work.length; i++) { %>
+                <li>
+                    <b><%= user._json.work[i].employer.name %></b>
+                </li>
+            <% } %>
+        </ul>
+    </p>
+
+    <p>
+        You studied at these schools:
+        <ul>
+            <% for(var i=0; i< user._json.education.length; i++) { %>
+                <li>
+                    <b><%= user._json.education[i].school.name %></b>
+                </li>
+            <% } %>
+        </ul>
+    </p>
+    <hr>
+
+    <p>Bellow, these is all information that I have after you clicked the blue button.</p>
+    <p>You see, I don't know who are your friends and your birthday date.</p>
+    
+    <pre class="prettyprint"><%= JSON.stringify(user, null, 2) %></pre>
+</div>
+
+
+<script type="text/javascript" src="google-code-prettify/src/prettify.js"></script>
+<script type="text/javascript">
+    prettyPrint();
+</script>
+
+<% } %>
