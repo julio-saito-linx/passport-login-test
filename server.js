@@ -43,7 +43,7 @@ if(process.env.IP){
   callbackURL = process.env.IP + "/auth/facebook/callback";
 }
 else{
-  callbackURL = "http://localhost:" + port + "/auth/facebook/callback"
+  callbackURL = "http://127.0.0.1:" + port + "/auth/facebook/callback"
 }
 
 
