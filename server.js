@@ -16,6 +16,7 @@ else {
   config.FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
   config.FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
   config.WEB_SITE_URI = process.env.WEB_SITE_URI;
+  config.PORT = process.env.PORT;
 }
 
 
