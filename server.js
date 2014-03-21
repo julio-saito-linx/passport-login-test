@@ -1,25 +1,22 @@
-var express = require('express')
-  , passport = require('passport')
-  , util = require('util')
-  , FacebookStrategy = require('passport-facebook').Strategy
-;
+'use strict';
 
-var port = process.env.PORT || 3000;
+var express = require('express'),
+    passport = require('passport'),
+    FacebookStrategy = require('passport-facebook').Strategy;
 
 var config = {};
 
 if (!process.env.FACEBOOK_APP_ID) {
   // from file
   config = require('./config/config');
+  config.WEB_SITE_URI = config.WEB_SITE_URI + ':' + config.PORT + '/auth/facebook/callback';
 }
 else {
   // from ENV (heroku)
   config.FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
   config.FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+  config.WEB_SITE_URI = process.env.WEB_SITE_URI;
 }
-
-var FACEBOOK_APP_ID = config.FACEBOOK_APP_ID;
-var FACEBOOK_APP_SECRET = config.FACEBOOK_APP_SECRET;
 
 
 // Passport session setup.
@@ -29,22 +26,13 @@ var FACEBOOK_APP_SECRET = config.FACEBOOK_APP_SECRET;
 //   the user by ID when deserializing.  However, since this example does not
 //   have a database of user records, the complete Facebook profile is serialized
 //   and deserialized.
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
+passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
-
-
-var callbackURL = "";
-if(process.env.IP){
-  callbackURL = process.env.IP + "/auth/facebook/callback";
-}
-else{
-  callbackURL = "http://127.0.0.1:" + port + "/auth/facebook/callback"
-}
 
 
 // Use the FacebookStrategy within Passport.
@@ -52,11 +40,11 @@ else{
 //   credentials (in this case, an accessToken, refreshToken, and Facebook
 //   profile), and invoke a callback with a user object.
 passport.use(new FacebookStrategy({
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: callbackURL
+    clientID: config.FACEBOOK_APP_ID,
+    clientSecret: config.FACEBOOK_APP_SECRET,
+    callbackURL: config.WEB_SITE_URI
   },
-  function(accessToken, refreshToken, profile, done) {
+  function (accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
       
@@ -75,7 +63,7 @@ passport.use(new FacebookStrategy({
 var app = express();
 
 // configure Express
-app.configure(function() {
+app.configure(function () {
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(express.logger());
@@ -89,20 +77,19 @@ app.configure(function() {
   app.use(passport.session());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
-  app.use(express.static(__dirname + '/bower_components'));
 });
 
 
-app.get('/', function(req, res){
+app.get('/', function (req, res) {
   // console.dir(req.user);
   res.render('index', { user: req.user });
 });
 
-app.get('/account', ensureAuthenticated, function(req, res){
+app.get('/account', ensureAuthenticated, function (req, res) {
   res.render('account', { user: req.user });
 });
 
-app.get('/login', function(req, res){
+app.get('/login', function (req, res) {
   res.render('login', { user: req.user });
 });
 
@@ -113,29 +100,29 @@ app.get('/login', function(req, res){
 //   redirect the user back to this application at /auth/facebook/callback
 app.get('/auth/facebook',
   passport.authenticate('facebook'),
-  function(req, res){
+  function (/*req, res*/) {
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
-  });
+});
 
 // GET /auth/facebook/callback
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  If authentication fails, the user will be redirected back to the
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
-app.get('/auth/facebook/callback', 
+app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
+  function (req, res) {
     res.redirect('/');
   });
 
-app.get('/logout', function(req, res){
+app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
 });
 
-app.listen(port);
-console.log('running at: http://localhost:' + port);
+app.listen(config.PORT);
+console.log('running at: http://localhost:' + config.PORT);
 
 // Simple route middleware to ensure user is authenticated.
 //   Use this route middleware on any resource that needs to be protected.  If
@@ -144,5 +131,5 @@ console.log('running at: http://localhost:' + port);
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  res.redirect('/login');
 }
