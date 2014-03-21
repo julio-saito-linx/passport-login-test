@@ -38,6 +38,8 @@ passport.deserializeUser(function(obj, done) {
 });
 
 
+var ip = process.env.IP || 'http://localhost';
+
 // Use the FacebookStrategy within Passport.
 //   Strategies in Passport require a `verify` function, which accept
 //   credentials (in this case, an accessToken, refreshToken, and Facebook
@@ -45,7 +47,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: "http://127.0.0.1:" + port + "/auth/facebook/callback"
+    callbackURL: "http:" + ip + ":" + port + "/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
